@@ -5,20 +5,21 @@ import { useOrg } from '../../context/OrgContext';
 import { isSupabaseConfigured } from '../../lib/supabase';
 import { 
   Building2, Lock, Mail, ArrowRight, 
-  ShieldCheck, Sparkles, AlertCircle, CheckCircle2 
+  ShieldCheck, AlertCircle, Eye, EyeOff, ShieldAlert 
 } from 'lucide-react';
 
 export const AdminLoginPage: React.FC = () => {
-  const { login, loginAsDemo, isAuthenticated } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const { settings } = useOrg();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // If already logged in, redirect to dashboard
+  // If already authenticated, redirect to admin dashboard
   React.useEffect(() => {
     if (isAuthenticated) {
       navigate('/admin/dashboard');
@@ -28,6 +29,12 @@ export const AdminLoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!email.trim() || !password) {
+      setError('Please provide both your registered email and password.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -35,28 +42,18 @@ export const AdminLoginPage: React.FC = () => {
       if (result.success) {
         navigate('/admin/dashboard');
       } else {
-        setError(result.error || 'Invalid credentials.');
+        setError(result.error || 'Invalid email or password. Access denied.');
       }
     } catch (err: any) {
-      setError(err.message || 'Login failed.');
+      setError(err.message || 'Authentication error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDemoAdmin = () => {
-    loginAsDemo('super_admin');
-    navigate('/admin/dashboard');
-  };
-
-  const handleDemoEditor = () => {
-    loginAsDemo('editor');
-    navigate('/admin/dashboard');
-  };
-
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-hidden">
-      {/* Background glow effects */}
+      {/* Background ambient lighting */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-brand-600/10 blur-[130px] rounded-full pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10 space-y-6">
@@ -75,122 +72,98 @@ export const AdminLoginPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Login Box */}
+        {/* Secure Login Box */}
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl space-y-6">
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <div>
-              <h2 className="text-base font-bold text-white font-heading">
-                Staff Authentication
+              <h2 className="text-base font-bold text-white font-heading flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Staff Authentication</span>
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
                 Authorized administrative access only
               </p>
             </div>
-            <div className="px-2.5 py-1 rounded-md bg-brand-500/10 border border-brand-500/20 text-brand-300 text-[10px] font-bold uppercase tracking-wider">
-              {isSupabaseConfigured ? 'Supabase Auth' : 'Demo Ready'}
+            <div className="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase tracking-wider">
+              {isSupabaseConfigured ? 'Supabase Auth' : 'Protected'}
             </div>
           </div>
 
           {error && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{error}</span>
+            <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-xs flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-rose-400" />
+              <span className="leading-relaxed">{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Email Address
+                Registered Staff Email
               </label>
               <div className="relative">
                 <input
                   type="email"
                   required
-                  placeholder="admin@organization.lk"
+                  autoComplete="email"
+                  placeholder="name@organization.lk"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                  disabled={loading}
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition disabled:opacity-50"
                 />
                 <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                  Password
+                </label>
+              </div>
               <div className="relative">
                 <input
-                  type="password"
-                  placeholder="••••••••••••"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                  disabled={loading}
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition disabled:opacity-50"
                 />
                 <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300 p-0.5"
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-lg shadow-brand-600/30 transition flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-lg shadow-brand-600/30 transition flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
             >
-              <span>{loading ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
+              <span>{loading ? 'Verifying Credentials...' : 'Sign In to Dashboard'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
-          {/* Quick Demo Login Option */}
-          <div className="pt-4 border-t border-slate-800 space-y-3">
-            <span className="text-[11px] font-semibold text-slate-400 block text-center uppercase tracking-wider">
-              Instant 1-Click Evaluation Login
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={handleDemoAdmin}
-                className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white transition border border-slate-700/80 hover:border-amber-500/50 flex flex-col items-start gap-1 group text-left shadow-sm"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center gap-1.5 font-bold text-xs text-white group-hover:text-amber-300 transition">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Admin Login</span>
-                  </div>
-                  <span className="text-[9px] uppercase px-1.5 py-0.5 rounded bg-amber-400/10 text-amber-300 font-bold border border-amber-400/20">
-                    Super Admin
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-400 group-hover:text-slate-200 transition font-mono mt-0.5">
-                  <Mail className="w-3 h-3 text-slate-500 group-hover:text-amber-400" />
-                  <span>admin@organization.lk</span>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleDemoEditor}
-                className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white transition border border-slate-700/80 hover:border-blue-500/50 flex flex-col items-start gap-1 group text-left shadow-sm"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center gap-1.5 font-bold text-xs text-white group-hover:text-blue-300 transition">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Editor Login</span>
-                  </div>
-                  <span className="text-[9px] uppercase px-1.5 py-0.5 rounded bg-blue-400/10 text-blue-300 font-bold border border-blue-400/20">
-                    Staff Editor
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-400 group-hover:text-slate-200 transition font-mono mt-0.5">
-                  <Mail className="w-3 h-3 text-slate-500 group-hover:text-blue-400" />
-                  <span>editor@organization.lk</span>
-                </div>
-              </button>
+          {/* Security Notice */}
+          <div className="pt-4 border-t border-slate-800">
+            <div className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-950/40 border border-slate-800/80 text-[11px] text-slate-400">
+              <ShieldAlert className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                <span className="font-semibold text-slate-300">Restricted Access:</span> Only provisioned staff accounts in the Supabase Authentication directory can access this portal. All administrative sessions and changes are cryptographically audited.
+              </p>
             </div>
-            <p className="text-[11px] text-slate-500 text-center">
-              Works instantly with mock database or live Supabase if keys are set.
-            </p>
           </div>
         </div>
 
