@@ -23,6 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment
+# Environment & Secrets (NEVER commit to git)
 .env
 .env.production
+.env.local
+.env.development
+.env.*
+!.env.example

@@ -147,22 +147,45 @@ export const AdminLoginPage: React.FC = () => {
             <span className="text-[11px] font-semibold text-slate-400 block text-center uppercase tracking-wider">
               Instant 1-Click Evaluation Login
             </span>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={handleDemoAdmin}
-                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition border border-slate-700 flex items-center justify-center gap-1.5"
+                className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white transition border border-slate-700/80 hover:border-amber-500/50 flex flex-col items-start gap-1 group text-left shadow-sm"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Admin Login</span>
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-white group-hover:text-amber-300 transition">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Admin Login</span>
+                  </div>
+                  <span className="text-[9px] uppercase px-1.5 py-0.5 rounded bg-amber-400/10 text-amber-300 font-bold border border-amber-400/20">
+                    Super Admin
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-400 group-hover:text-slate-200 transition font-mono mt-0.5">
+                  <Mail className="w-3 h-3 text-slate-500 group-hover:text-amber-400" />
+                  <span>admin@organization.lk</span>
+                </div>
               </button>
+
               <button
                 type="button"
                 onClick={handleDemoEditor}
-                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition border border-slate-700 flex items-center justify-center gap-1.5"
+                className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white transition border border-slate-700/80 hover:border-blue-500/50 flex flex-col items-start gap-1 group text-left shadow-sm"
               >
-                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                <span>Editor Login</span>
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-white group-hover:text-blue-300 transition">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Editor Login</span>
+                  </div>
+                  <span className="text-[9px] uppercase px-1.5 py-0.5 rounded bg-blue-400/10 text-blue-300 font-bold border border-blue-400/20">
+                    Staff Editor
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-400 group-hover:text-slate-200 transition font-mono mt-0.5">
+                  <Mail className="w-3 h-3 text-slate-500 group-hover:text-blue-400" />
+                  <span>editor@organization.lk</span>
+                </div>
               </button>
             </div>
             <p className="text-[11px] text-slate-500 text-center">
