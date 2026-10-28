@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Director } from '../../types/database';
 import { Modal } from '../common/Modal';
 import { StatusBadge } from '../common/StatusBadge';
-import { Mail, Linkedin, User, Award, Shield } from 'lucide-react';
+import { Mail, User, Award, Shield } from 'lucide-react';
+import { Linkedin } from '../common/Icons';
 
 interface DirectorCardProps {
   director: Director;

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { NewsItem, Director, OrgSettings, AuditLog } from '../types/database';
 import { api } from '../lib/api';
+import { initialNews, initialDirectors, initialSettings } from '../data/initialData';
 
 interface OrgContextType {
   news: NewsItem[];
@@ -26,11 +27,11 @@ interface OrgContextType {
 const OrgContext = createContext<OrgContextType | undefined>(undefined);
 
 export const OrgProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [directors, setDirectors] = useState<Director[]>([]);
-  const [settings, setSettings] = useState<OrgSettings>(api.getSettings as any);
+  const [news, setNews] = useState<NewsItem[]>(initialNews);
+  const [directors, setDirectors] = useState<Director[]>(initialDirectors);
+  const [settings, setSettings] = useState<OrgSettings>(initialSettings);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -42,7 +43,6 @@ export const OrgProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const refreshAll = useCallback(async () => {
-    setIsLoading(true);
     try {
       const [fetchedNews, fetchedDirectors, fetchedSettings, fetchedLogs] = await Promise.all([
         api.getNews(),
@@ -50,14 +50,20 @@ export const OrgProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         api.getSettings(),
         api.getAuditLogs()
       ]);
-      setNews(fetchedNews);
-      setDirectors(fetchedDirectors);
-      setSettings(fetchedSettings);
-      setAuditLogs(fetchedLogs);
+      if (fetchedNews && fetchedNews.length > 0) {
+        setNews(fetchedNews);
+      }
+      if (fetchedDirectors && fetchedDirectors.length > 0) {
+        setDirectors(fetchedDirectors);
+      }
+      if (fetchedSettings && fetchedSettings.name) {
+        setSettings(fetchedSettings);
+      }
+      if (fetchedLogs && fetchedLogs.length > 0) {
+        setAuditLogs(fetchedLogs);
+      }
     } catch (e) {
       console.error('Error refreshing organization data:', e);
-    } finally {
-      setIsLoading(false);
     }
   }, []);
 

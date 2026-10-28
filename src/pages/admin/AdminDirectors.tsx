@@ -8,7 +8,7 @@ import { ImageUpload } from '../../components/common/ImageUpload';
 import { Director } from '../../types/database';
 import { 
   PlusCircle, ArrowUp, ArrowDown, Edit3, Trash2, 
-  CheckCircle2, XCircle, Users, Mail, Linkedin, Move 
+  CheckCircle2, XCircle, Users, Mail, Move 
 } from 'lucide-react';
 
 export const AdminDirectors: React.FC = () => {

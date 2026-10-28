@@ -1,8 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Environment variables can be configured via .env file or local storage
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('supabase_url') || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('supabase_anon_key') || '';
+// Default to live Supabase project so Netlify works automatically even before setting environment variables in Netlify UI
+const DEFAULT_SUPABASE_URL = 'https://rklzfympcexkdahuacgg.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_kE2bD-w4PQ9hITyvxWEA6g_yQJQB1YZ';
+
+const supabaseUrl = 
+  (import.meta.env.VITE_SUPABASE_URL as string) || 
+  localStorage.getItem('supabase_url') || 
+  DEFAULT_SUPABASE_URL;
+
+const supabaseAnonKey = 
+  (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || 
+  localStorage.getItem('supabase_anon_key') || 
+  DEFAULT_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = Boolean(
   supabaseUrl && 
